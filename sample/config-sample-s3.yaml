@@ -1,0 +1,18 @@
+connection: postgresql://postgres:123@localhost/postgres?replication=database
+slot:
+  name: pg2parquet
+  temporary: false
+  max_messages: 2048
+  plugin: pgoutput
+tables:
+  - users
+  # - users_arr
+
+parquet:
+  size: 100MB # humanize
+
+storage:
+  type: s3
+  path: pg2parquet/{{ .table }}/{{ now | date "2006-01-02" }}/{{ .table }}-{{ .start_lsn }}.parquet
+  bucket: datalake
+  endpoint: http://localhost:4566

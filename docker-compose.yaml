@@ -1,0 +1,41 @@
+
+services:
+  postgres:
+    build:
+      context: ./docker/postgres-test
+    # user: "1000"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "123"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - pg:/var/lib/postgresql/data/pgdata
+    ports:
+      - 5432:5432
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - DEFAULT_REGION=us-east-2
+      - SERVICES=s3
+      - DATA_DIR=/data
+    ports:
+      - 4566:4566
+    volumes:
+      - localstack:/data
+      - ./docker/localstack:/docker-entrypoint-initaws.d
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  localstack:
+  pg:
+    name: pg_volume
+    # driver: local
+    # driver_opts:
+    #   device: ./pg-data
+    #   o: bind
+    #   type: mount
